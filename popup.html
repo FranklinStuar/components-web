@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body:has( .no-scrolling-body) {
+        overflow: hidden;
+        transition: 0.3s overflow;
+      }
+
+      /* estilo para el popup */
+      .popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.5s;
+        opacity: 0;
+        display: none;
+      }
+
+      /* estilo para el contenido del popup */
+      .popup-content {
+        background: #fff;
+        padding: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 80%;
+      }
+
+      /* estilo para el botón de cierre del popup */
+      .popup-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+      }
+      .popup-bg{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+      }
+      /* define los keyframes para el efecto de fade in y fade out */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+    </style>
+    
+    <!-- contenido del documento -->
+
+    <!-- botón para abrir el popup -->
+    <button id="open-popup">Abrir Popup</button>
+
+    <!-- crea un elemento div para el popup y establece su ancho y alto en el 80% de la pantalla -->
+    <div class="popup" >
+      <div class="popup-bg"></div>
+      <!-- contenido del popup -->
+      <div class="popup-content">
+        <h1>Título del Popup</h1>
+        <p>Contenido del popup.</p>
+        <!-- botón de cierre del popup -->
+        <button class="popup-close">Cerrar</button>
+      </div>
+    </div>
+
+    <script>
+      // function for closing the popup that can be reused.
+      function closepopupFunction(){
+        // Apply the fade out effect to the popup
+        popup.style.animation = "fadeOut 0.5s";
+        popup.style.opacity = 0;
+        // clase usada para quitar el overflow al body, no funciona en mozilla
+        popup.classList.remove("no-scrolling-body")
+        /*elimina con css el popup para que no interfiera con el contenido*/
+        setTimeout(() => {
+          popup.style.display="none"
+        }, 500);
+      }
+
+      // Función para abrir el popup que puede ser reutilizado
+      function openpopupFunction(){
+        // primero agrega el popup al html para poder interactual con el mismo
+        popup.style.display="block"
+        // aplica el efecto de fade in al popup
+        popup.style.animation = "fadeIn 0.5s";
+        popup.style.opacity = 1;
+        // clase usada para quitar el overflow al body, no funciona en mozilla
+        popup.classList.add("no-scrolling-body")
+      }
+
+      // obtiene el elemento del popup
+      var popup = document.querySelector(".popup");
+
+      // obtiene el botón de apertura del popup
+      var openButton = document.querySelector("#open-popup");
+      // muestra el popup cuando se haga clic en el botón
+      openButton.addEventListener("click", function() {
+        openpopupFunction()
+      });
+        
+      // cierra el popup cuando se le da un click al elemento que se tiene como background
+      var popupBg = document.querySelector(".popup-bg");
+      popupBg.addEventListener("click", function() {
+        closepopupFunction()
+      });
+
+      // cierra el popup al presionar la tecla "escape"
+      document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+          closepopupFunction()
+        }
+      });
+    
+      // cierra el popup al hacer clic en el botón de cierre
+      var closeButton = document.querySelector(".popup-close");
+      closeButton.addEventListener("click", function() {
+        closepopupFunction()
+      });
+    
+    </script>
+    
+
+  </body>
+</html>
