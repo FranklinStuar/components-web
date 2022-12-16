@@ -3,13 +3,14 @@
 <html>
   <head>
     <style>
+
       body:has( .no-scrolling-body) {
         overflow: hidden;
         transition: 0.3s overflow;
       }
 
       /* estilo para el popup */
-      .popup {
+      .simple-popup {
         position: fixed;
         top: 0;
         left: 0;
@@ -19,9 +20,8 @@
         opacity: 0;
         display: none;
       }
-
       /* estilo para el contenido del popup */
-      .popup-content {
+      .simple-popup-content {
         background: #fff;
         padding: 20px;
         position: absolute;
@@ -33,13 +33,13 @@
       }
 
       /* estilo para el botón de cierre del popup */
-      .popup-close {
+      .simple-popup-close {
         position: absolute;
         top: 10px;
         right: 10px;
         cursor: pointer;
       }
-      .popup-bg{
+      .simple-popup-bg{
         position: absolute;
         top: 0;
         left: 0;
@@ -48,6 +48,7 @@
         background: rgba(0, 0, 0, 0.5);
         z-index: -1;
       }
+
       /* define los keyframes para el efecto de fade in y fade out */
       @keyframes fadeIn {
         from {
@@ -71,23 +72,29 @@
     <!-- contenido del documento -->
 
     <!-- botón para abrir el popup -->
-    <button id="open-popup">Abrir Popup</button>
+    <button class="simple-popup--open" data-popup="comming-soon--popup">Abrir Popup</button>
+    <button class="simple-popup--open" data-popup="comming-soon--popup">Abrir Popup</button>
+    <button class="simple-popup--open" data-popup="comming-soon--popup">Abrir Popup</button>
+    <button class="simple-popup--open" data-popup="comming-soon--popup">Abrir Popup</button>
 
     <!-- crea un elemento div para el popup y establece su ancho y alto en el 80% de la pantalla -->
-    <div class="popup" >
-      <div class="popup-bg"></div>
+    <div id="comming-soon--popup" class="simple-popup" >
+      <div class="simple-popup-bg"></div>
       <!-- contenido del popup -->
-      <div class="popup-content">
+      <div class="simple-popup-content">
         <h1>Título del Popup</h1>
         <p>Contenido del popup.</p>
         <!-- botón de cierre del popup -->
-        <button class="popup-close">Cerrar</button>
+        <button class="simple-popup-close">Cerrar</button>
       </div>
     </div>
 
     <script>
-      // function for closing the popup that can be reused.
-      function closepopupFunction(){
+      document.addEventListener('DOMContentLoaded', function(event) {
+        //Closure para el popup
+        function simplePopupFunction(popup){
+        // function for closing the popup that can be reused.
+        var closepopupFunction = () => {
         // Apply the fade out effect to the popup
         popup.style.animation = "fadeOut 0.5s";
         popup.style.opacity = 0;
@@ -95,12 +102,12 @@
         popup.classList.remove("no-scrolling-body")
         /*elimina con css el popup para que no interfiera con el contenido*/
         setTimeout(() => {
-          popup.style.display="none"
+        popup.style.display="none"
         }, 500);
-      }
+        }
 
-      // Función para abrir el popup que puede ser reutilizado
-      function openpopupFunction(){
+        // Función para abrir el popup que puede ser reutilizado
+        var openpopupFunction = () => {
         // primero agrega el popup al html para poder interactual con el mismo
         popup.style.display="block"
         // aplica el efecto de fade in al popup
@@ -108,36 +115,64 @@
         popup.style.opacity = 1;
         // clase usada para quitar el overflow al body, no funciona en mozilla
         popup.classList.add("no-scrolling-body")
-      }
-
-      // obtiene el elemento del popup
-      var popup = document.querySelector(".popup");
-
-      // obtiene el botón de apertura del popup
-      var openButton = document.querySelector("#open-popup");
-      // muestra el popup cuando se haga clic en el botón
-      openButton.addEventListener("click", function() {
-        openpopupFunction()
-      });
-        
-      // cierra el popup cuando se le da un click al elemento que se tiene como background
-      var popupBg = document.querySelector(".popup-bg");
-      popupBg.addEventListener("click", function() {
-        closepopupFunction()
-      });
-
-      // cierra el popup al presionar la tecla "escape"
-      document.addEventListener("keydown", function(event) {
-        if (event.key === "Escape") {
-          closepopupFunction()
         }
-      });
-    
-      // cierra el popup al hacer clic en el botón de cierre
-      var closeButton = document.querySelector(".popup-close");
-      closeButton.addEventListener("click", function() {
+
+        // cierra el popup cuando se le da un click al elemento que se tiene como background
+        var popupBg = popup.querySelector(".simple-popup-bg");
+        popupBg.addEventListener("click", function() {
         closepopupFunction()
-      });
+        });
+
+
+        // cierra el popup al presionar la tecla "escape"
+        document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+        closepopupFunction()
+        }
+        });
+
+        // cierra el popup al hacer clic en el botón de cierre
+        var closeButton = popup.querySelector(".simple-popup-close");
+        closeButton.addEventListener("click", function() {
+        closepopupFunction()
+        });
+
+        return {
+        id:popup.id,
+        openPopup:openpopupFunction
+        }
+        }
+
+
+        // obtiene el elemento del popup
+        var simplesPopupPg = document.querySelectorAll(".simple-popup");
+        //valida que haya popups y empieza a hacer las validaciones
+        if(simplesPopupPg){
+
+        //uso clousures para indicar que lo que está dentro del popup está encapsulado pero devuelve datos para poder validar y abrir el popup
+        const simplePopupArray = []
+        simplesPopupPg.forEach((popup,index) => {
+        simplePopupArray[index] = new simplePopupFunction(popup)
+        });
+
+        // obtiene el botón de apertura del popup
+        const openButtonsPopup = document.querySelectorAll(".simple-popup--open");
+
+        openButtonsPopup.forEach(buttonOpenPopup => {
+        // revisa todos los popups para ver cuál es el popup con el que se va a trabajar
+        simplePopupArray.forEach((popup, index) => {
+        if(buttonOpenPopup.dataset.popup == popup.id){
+        // muestra el popup cuando se haga clic en el botón
+        buttonOpenPopup.addEventListener("click", function() {
+        popup.openPopup()
+        });
+        return false // cierra el foreach de los popups
+        }
+        });
+        });
+        }
+      })
+
     
     </script>
     
